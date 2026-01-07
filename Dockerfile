@@ -14,10 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Verify git installation
 RUN which git && git --version
 
-# Install PyTorch with CUDA 12.1 compatibility
+# Install PyTorch without forcing a specific CUDA build
 RUN pip3 install --no-cache-dir \
-    torch==2.1.0+cu121 torchvision==0.16.0+cu121 torchaudio==2.1.0+cu121 \
-    --find-links https://download.pytorch.org/whl/cu121
+    torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 \
+    --index-url https://download.pytorch.org/whl/cu121
 
 # Preload the facebook/musicgen-large model and safetensors into the cache
 RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('facebook/musicgen-large')"
