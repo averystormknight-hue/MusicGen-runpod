@@ -14,7 +14,7 @@ from audiocraft.models import MusicGen
 
 MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-large")
 DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "90"))
-DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "30"))
+DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "15"))
 DEFAULT_OUTPUT_FORMAT = os.getenv("DEFAULT_OUTPUT_FORMAT", "wav")
 DEFAULT_STRUCTURE = os.getenv(
     "DEFAULT_STRUCTURE", "intro|verse|chorus|verse|chorus|outro"
@@ -23,7 +23,7 @@ DEFAULT_XFADE_SECONDS = float(os.getenv("DEFAULT_XFADE_SECONDS", "0.5"))
 DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "3.0"))
 DEFAULT_TEMPERATURE = float(os.getenv("DEFAULT_TEMPERATURE", "1.0"))
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "250"))
-DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.0"))
+DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.9"))
 
 _MODEL = None
 _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -130,15 +130,23 @@ def handler(job):
     if not prompt and not lyrics:
         return {"error": "prompt or lyrics is required"}
 
-    duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
-    segment_seconds = int(inp.get("segment_seconds", DEFAULT_SEGMENT_SECONDS))
     structure = parse_structure(inp.get("structure", DEFAULT_STRUCTURE))
-
-    if structure:
-        if "segment_seconds" not in inp:
-            segment_seconds = max(10, int(round(duration_seconds / len(structure))))
+    
+    # Derive segment_seconds only when user supplies structure without segment_seconds
+    if structure and "segment_seconds" not in inp:
+        duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
+        segment_seconds = max(10, int(round(duration_seconds / len(structure))))
+    else:
+        segment_seconds = int(inp.get("segment_seconds", DEFAULT_SEGMENT_SECONDS))
+    
+    # Derive total duration only when user doesn't supply it
+    if structure and "duration_seconds" not in inp:
         duration_seconds = segment_seconds * len(structure)
     else:
+        duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
+    
+    # Generate structure if not provided
+    if not structure:
         count = max(1, int(math.ceil(duration_seconds / segment_seconds)))
         structure = [f"segment_{i + 1}" for i in range(count)]
 
@@ -179,12 +187,11 @@ def handler(job):
         with torch.no_grad():
             if prev_segment is not None and hasattr(model, "generate_continuation"):
                 try:
-                    segment = model.generate_continuation(prev_segment, sample_rate, [seg_prompt])[0]
-                except TypeError:
-                    try:
-                        segment = model.generate_continuation([seg_prompt], prev_segment)[0]
-                    except Exception:
-                        segment = model.generate([seg_prompt])[0]
+                    # audiocraft 1.2.0 signature: generate_continuation(prompt, audio, ...)
+                    segment = model.generate_continuation([seg_prompt], prev_segment)[0]
+                except Exception:
+                    # Fallback to generate on failure
+                    segment = model.generate([seg_prompt])[0]
             else:
                 segment = model.generate([seg_prompt])[0]
 
