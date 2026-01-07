@@ -17,6 +17,7 @@ RUN which git && git --version
 # Install PyTorch with CUDA 11.8 compatibility
 RUN pip3 install --no-cache-dir \
     torch==2.1.0+cu118 torchvision==0.16.0+cu118 torchaudio==2.1.0+cu118
+    
 # Preload the facebook/musicgen-large model and safetensors into the cache
 RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('facebook/musicgen-large')"
 
