@@ -141,7 +141,7 @@ def handler(job):
         # Derive segment_seconds only when user supplies structure without segment_seconds
         duration_seconds = int(user_duration) if user_duration is not None else DEFAULT_DURATION_SECONDS
         segment_seconds = max(10, int(round(duration_seconds / len(structure))))
-        # Don't recalculate duration - use the one we just determined
+        # Duration is already determined above - don't recalculate to avoid circular logic
     elif user_segment is not None:
         segment_seconds = int(user_segment)
         # Derive total duration only when user doesn't supply it
@@ -196,7 +196,7 @@ def handler(job):
         with torch.no_grad():
             if prev_segment is not None and hasattr(model, "generate_continuation"):
                 try:
-                    # audiocraft 1.2.0 signature: generate_continuation(prompt, audio, ...)
+                    # audiocraft 1.2.0 signature: generate_continuation(prompts, conditioning_audio, ...)
                     segment = model.generate_continuation([seg_prompt], prev_segment)[0]
                 except Exception:
                     # Fallback to generate on failure
