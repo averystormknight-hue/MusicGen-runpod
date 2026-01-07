@@ -46,7 +46,7 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
 - `lyrics` (string, optional)
 - `style` (string, optional)
 - `duration_seconds` (int, default 90)
-- `segment_seconds` (int, default 30)
+- `segment_seconds` (int, default 15)
 - `structure` (string `a|b|c` or array, default `intro|verse|chorus|verse|chorus|outro`)
 - `output_format` (`wav` or `mp3`, default `wav`)
 - `seed` (int, optional)
