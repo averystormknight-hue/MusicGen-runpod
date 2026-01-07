@@ -1,0 +1,11 @@
+{
+  "tests": [
+    {
+      "name": "smoke",
+      "timeout": 120,
+      "input": {
+        "test_mode": true
+      }
+    }
+  ]
+}

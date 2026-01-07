@@ -1,0 +1,11 @@
+{
+  "title": "MusicGen T2M Serverless",
+  "description": "MusicGen text-to-music endpoint with section-based chunking and crossfades.",
+  "type": "serverless",
+  "category": "audio",
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 30,
+    "jobTimeoutSec": 3600
+  }
+}
