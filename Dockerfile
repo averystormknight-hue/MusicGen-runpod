@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
@@ -14,11 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Verify git installation
 RUN which git && git --version
 
-# Install PyTorch without forcing a specific CUDA build
+# Install PyTorch with CUDA 11.8 compatibility
 RUN pip3 install --no-cache-dir \
-    torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 \
-    --index-url https://download.pytorch.org/whl/cu121
-
+    torch==2.1.0+cu118 torchvision==0.16.0+cu118 torchaudio==2.1.0+cu118
 # Preload the facebook/musicgen-large model and safetensors into the cache
 RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('facebook/musicgen-large')"
 
