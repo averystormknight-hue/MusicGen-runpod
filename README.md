@@ -5,8 +5,10 @@ RunPod Serverless worker for MusicGen (text-to-music) with optional section-base
 ## Defaults
 - Model: `facebook/musicgen-large`
 - Total length: 90s
+- Segment length: ~15s (when using default 6-section structure)
 - Structure: `intro|verse|chorus|verse|chorus|outro`
-- Segment length: auto-derived when structure is provided (90s / 6 = ~15s)
+- Sampling: top_p 0.9, top_k 250, cfg 3.0, temperature 1.0
+- Crossfade: 0.5s
 - Output: WAV
 - top_p: 0.9, top_k: 250, cfg: 3.0, temperature: 1.0
 - Crossfade: 0.5s
@@ -23,7 +25,6 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
     "lyrics": "neon hearts in the midnight rain",
     "style": "cinematic, moody, 100 BPM",
     "duration_seconds": 90,
-    "segment_seconds": 15,
     "structure": "intro|verse|chorus|verse|chorus|outro",
     "output_format": "wav",
     "seed": 42
@@ -47,7 +48,7 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
 - `lyrics` (string, optional)
 - `style` (string, optional)
 - `duration_seconds` (int, default 90)
-- `segment_seconds` (int, default ~15 when structure is provided; otherwise default 15)
+- `segment_seconds` (int, default 15)
 - `structure` (string `a|b|c` or array, default `intro|verse|chorus|verse|chorus|outro`)
 - `output_format` (`wav` or `mp3`, default `wav`)
 - `seed` (int, optional)
