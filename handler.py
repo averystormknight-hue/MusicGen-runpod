@@ -14,7 +14,6 @@ from audiocraft.models import MusicGen
 
 MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-large")
 DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "90"))
-# With the 6-part default structure and a 90s total, segments are ~15s.
 DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "15"))
 DEFAULT_OUTPUT_FORMAT = os.getenv("DEFAULT_OUTPUT_FORMAT", "wav")
 DEFAULT_STRUCTURE = os.getenv(
@@ -24,18 +23,26 @@ DEFAULT_XFADE_SECONDS = float(os.getenv("DEFAULT_XFADE_SECONDS", "0.5"))
 DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "3.0"))
 DEFAULT_TEMPERATURE = float(os.getenv("DEFAULT_TEMPERATURE", "1.0"))
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "250"))
-# Use a sensible default for nucleus sampling.
 DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.9"))
 
 _MODEL = None
 _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+# Logging cache directories for better visibility
+print("Cache Configuration:")
+print(f"HF_HOME: {os.getenv('HF_HOME', 'Not set')}")
+print(f"TRANSFORMERS_CACHE: {os.getenv('TRANSFORMERS_CACHE', 'Not set')}")
+print(f"TORCH_HOME: {os.getenv('TORCH_HOME', 'Not set')}")
+
 
 def get_model():
+    # Add logging around model initialization to track progress
     global _MODEL
     if _MODEL is None:
+        print(f"Downloading and loading model '{MODEL_NAME}'...")
         _MODEL = MusicGen.get_pretrained(MODEL_NAME)
         _MODEL.to(_DEVICE)
+        print("Model loaded successfully!")
     return _MODEL
 
 
