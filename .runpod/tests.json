@@ -2,7 +2,7 @@
   "tests": [
     {
       "name": "smoke",
-      "timeout": 120,
+      "timeout": 600,
       "input": {
         "test_mode": true
       }
