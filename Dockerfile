@@ -19,4 +19,5 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 COPY . /app
 RUN chmod +x /app/entrypoint.sh
 
-CMD ["/app/entrypoint.sh"]
+# Use exec form with explicit shell to avoid format/errors and honor signals
+CMD ["/bin/bash", "/app/entrypoint.sh"]
