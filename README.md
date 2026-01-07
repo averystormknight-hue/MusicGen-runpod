@@ -5,9 +5,11 @@ RunPod Serverless worker for MusicGen (text-to-music) with optional section-base
 ## Defaults
 - Model: `facebook/musicgen-large`
 - Total length: 90s
-- Segment length: 30s
 - Structure: `intro|verse|chorus|verse|chorus|outro`
+- Segment length: auto-derived when structure is provided (90s / 6 = ~15s)
 - Output: WAV
+- top_p: 0.9, top_k: 250, cfg: 3.0, temperature: 1.0
+- Crossfade: 0.5s
 
 ## Notes on Lyrics
 Lyrics are used as conditioning text. This model does **not** guarantee word-accurate vocals.
@@ -21,7 +23,7 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
     "lyrics": "neon hearts in the midnight rain",
     "style": "cinematic, moody, 100 BPM",
     "duration_seconds": 90,
-    "segment_seconds": 30,
+    "segment_seconds": 15,
     "structure": "intro|verse|chorus|verse|chorus|outro",
     "output_format": "wav",
     "seed": 42
@@ -36,7 +38,7 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
   "duration_seconds": 90,
   "sample_rate": 32000,
   "structure": ["intro", "verse", "chorus", "verse", "chorus", "outro"],
-  "segment_seconds": 30
+  "segment_seconds": 15
 }
 ```
 
@@ -45,20 +47,21 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
 - `lyrics` (string, optional)
 - `style` (string, optional)
 - `duration_seconds` (int, default 90)
-- `segment_seconds` (int, default 30)
+- `segment_seconds` (int, default ~15 when structure is provided; otherwise default 15)
 - `structure` (string `a|b|c` or array, default `intro|verse|chorus|verse|chorus|outro`)
 - `output_format` (`wav` or `mp3`, default `wav`)
 - `seed` (int, optional)
-- `cfg`, `temperature`, `top_k`, `top_p` (advanced)
+- `cfg`, `temperature`, `top_k`, `top_p` (advanced; defaults cfg=3.0, temp=1.0, top_k=250, top_p=0.9)
 - `xfade_seconds` (float, default 0.5)
 
 ## Environment Variables
 - `MODEL_NAME` (default: `facebook/musicgen-large`)
 - `DEFAULT_DURATION_SECONDS` (default: `90`)
-- `DEFAULT_SEGMENT_SECONDS` (default: `30`)
+- `DEFAULT_SEGMENT_SECONDS` (default: `15`)
 - `DEFAULT_OUTPUT_FORMAT` (default: `wav`)
 - `DEFAULT_STRUCTURE` (default: `intro|verse|chorus|verse|chorus|outro`)
 - `DEFAULT_XFADE_SECONDS` (default: `0.5`)
+- `DEFAULT_TOP_P` (default: `0.9`)
 
 ## GPU
 - 24GB+ recommended for MusicGen Large
