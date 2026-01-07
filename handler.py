@@ -160,7 +160,7 @@ def handler(job):
         structure = [f"segment_{i + 1}" for i in range(count)]
 
     durations = [segment_seconds] * len(structure)
-    if duration_seconds and len(structure) > 1:
+    if duration_seconds and len(structure) > 0:
         remaining = duration_seconds - (segment_seconds * (len(structure) - 1))
         if remaining > 0:
             durations[-1] = remaining
