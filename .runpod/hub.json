@@ -6,6 +6,6 @@
   "config": {
     "runsOn": "GPU",
     "containerDiskInGb": 40,
-    "jobTimeoutSec": 3600
+    "jobTimeoutSec": 1800
   }
 }
