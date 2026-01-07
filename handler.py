@@ -14,7 +14,8 @@ from audiocraft.models import MusicGen
 
 MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-large")
 DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "90"))
-DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "30"))
+# With the 6-part default structure and a 90s total, segments are ~15s.
+DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "15"))
 DEFAULT_OUTPUT_FORMAT = os.getenv("DEFAULT_OUTPUT_FORMAT", "wav")
 DEFAULT_STRUCTURE = os.getenv(
     "DEFAULT_STRUCTURE", "intro|verse|chorus|verse|chorus|outro"
@@ -23,7 +24,8 @@ DEFAULT_XFADE_SECONDS = float(os.getenv("DEFAULT_XFADE_SECONDS", "0.5"))
 DEFAULT_CFG = float(os.getenv("DEFAULT_CFG", "3.0"))
 DEFAULT_TEMPERATURE = float(os.getenv("DEFAULT_TEMPERATURE", "1.0"))
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "250"))
-DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.0"))
+# Use a sensible default for nucleus sampling.
+DEFAULT_TOP_P = float(os.getenv("DEFAULT_TOP_P", "0.9"))
 
 _MODEL = None
 _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -130,20 +132,37 @@ def handler(job):
     if not prompt and not lyrics:
         return {"error": "prompt or lyrics is required"}
 
-    duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
-    segment_seconds = int(inp.get("segment_seconds", DEFAULT_SEGMENT_SECONDS))
-    structure = parse_structure(inp.get("structure", DEFAULT_STRUCTURE))
+    duration_seconds_input = inp.get("duration_seconds")
+    segment_seconds_input = inp.get("segment_seconds")
+    structure_input = inp.get("structure")
+
+    duration_seconds = (
+        int(duration_seconds_input) if duration_seconds_input is not None else DEFAULT_DURATION_SECONDS
+    )
+    segment_seconds = (
+        int(segment_seconds_input) if segment_seconds_input is not None else DEFAULT_SEGMENT_SECONDS
+    )
+    structure = (
+        parse_structure(structure_input)
+        if structure_input is not None
+        else parse_structure(DEFAULT_STRUCTURE)
+    )
+    structure_provided_by_user = structure_input is not None
+    duration_provided_by_user = duration_seconds_input is not None
 
     if structure:
-        if "segment_seconds" not in inp:
-            segment_seconds = max(10, int(round(duration_seconds / len(structure))))
-        duration_seconds = segment_seconds * len(structure)
+        # If the user supplied a structure but not a segment length, derive segment length from total duration.
+        if structure_provided_by_user and segment_seconds_input is None:
+            segment_seconds = max(10, int(math.ceil(duration_seconds / len(structure))))
+        # If the user did not supply duration, derive total duration from structure * segment length.
+        if not duration_provided_by_user:
+            duration_seconds = segment_seconds * len(structure)
     else:
         count = max(1, int(math.ceil(duration_seconds / segment_seconds)))
         structure = [f"segment_{i + 1}" for i in range(count)]
 
     durations = [segment_seconds] * len(structure)
-    if duration_seconds and len(structure) > 1:
+    if duration_seconds and len(structure) > 0:
         remaining = duration_seconds - (segment_seconds * (len(structure) - 1))
         if remaining > 0:
             durations[-1] = remaining
@@ -179,12 +198,10 @@ def handler(job):
         with torch.no_grad():
             if prev_segment is not None and hasattr(model, "generate_continuation"):
                 try:
-                    segment = model.generate_continuation(prev_segment, sample_rate, [seg_prompt])[0]
-                except TypeError:
-                    try:
-                        segment = model.generate_continuation([seg_prompt], prev_segment)[0]
-                    except Exception:
-                        segment = model.generate([seg_prompt])[0]
+                    # Audiocraft 1.2.0 signature: generate_continuation(prompt, audio, ...)
+                    segment = model.generate_continuation([seg_prompt], prev_segment)[0]
+                except Exception:
+                    segment = model.generate([seg_prompt])[0]
             else:
                 segment = model.generate([seg_prompt])[0]
 
