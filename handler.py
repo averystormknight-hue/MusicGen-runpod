@@ -132,18 +132,27 @@ def handler(job):
 
     structure = parse_structure(inp.get("structure", DEFAULT_STRUCTURE))
     
-    # Derive segment_seconds only when user supplies structure without segment_seconds
-    if structure and "segment_seconds" not in inp:
-        duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
-        segment_seconds = max(10, int(round(duration_seconds / len(structure))))
-    else:
-        segment_seconds = int(inp.get("segment_seconds", DEFAULT_SEGMENT_SECONDS))
+    # Get user inputs (or None if not provided)
+    user_duration = inp.get("duration_seconds")
+    user_segment = inp.get("segment_seconds")
     
-    # Derive total duration only when user doesn't supply it
-    if structure and "duration_seconds" not in inp:
-        duration_seconds = segment_seconds * len(structure)
+    # Apply defaulting logic
+    if structure and user_segment is None:
+        # Derive segment_seconds only when user supplies structure without segment_seconds
+        duration_seconds = int(user_duration) if user_duration is not None else DEFAULT_DURATION_SECONDS
+        segment_seconds = max(10, int(round(duration_seconds / len(structure))))
+        # Don't recalculate duration - use the one we just determined
+    elif user_segment is not None:
+        segment_seconds = int(user_segment)
+        # Derive total duration only when user doesn't supply it
+        if structure and user_duration is None:
+            duration_seconds = segment_seconds * len(structure)
+        else:
+            duration_seconds = int(user_duration) if user_duration is not None else DEFAULT_DURATION_SECONDS
     else:
-        duration_seconds = int(inp.get("duration_seconds", DEFAULT_DURATION_SECONDS))
+        # No structure, use defaults
+        segment_seconds = DEFAULT_SEGMENT_SECONDS
+        duration_seconds = int(user_duration) if user_duration is not None else DEFAULT_DURATION_SECONDS
     
     # Generate structure if not provided
     if not structure:
