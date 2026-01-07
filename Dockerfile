@@ -1,11 +1,15 @@
 FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PATH="/usr/local/bin:/usr/bin:${PATH}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip git curl ffmpeg ca-certificates libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
+
+# Verify git is available (build will fail otherwise)
+RUN which git && git --version
 
 # Align torch stack with audiocraft 1.2.0 expectations (2.1.0 + cu121). If you don’t need vision, you can drop torchvision.
 RUN pip3 install --no-cache-dir \
