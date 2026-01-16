@@ -19,8 +19,7 @@ RUN pip3 install --no-cache-dir \
     torch==2.1.2+cu121 torchvision==0.16.2+cu121 torchaudio==2.1.2+cu121 \
     --extra-index-url https://download.pytorch.org/whl/cu121
     
-# Preload the facebook/musicgen-large model and safetensors into the cache
-RUN python3 -c "from transformers import AutoModel; AutoModel.from_pretrained('facebook/musicgen-large')"
+# (Skip preloading the 9GB model at build time; it will download on first run.)
 
 # Set working directory and install Python dependencies
 WORKDIR /app
