@@ -12,9 +12,9 @@ import soundfile as sf
 import torch
 from audiocraft.models import MusicGen
 
-MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-large")
-DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "90"))
-DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "15"))
+MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-medium")
+DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "20"))
+DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "10"))
 DEFAULT_OUTPUT_FORMAT = os.getenv("DEFAULT_OUTPUT_FORMAT", "wav")
 DEFAULT_STRUCTURE = os.getenv(
     "DEFAULT_STRUCTURE", "intro|verse|chorus|verse|chorus|outro"
