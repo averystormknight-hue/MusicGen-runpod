@@ -2,7 +2,7 @@
   "tests": [
     {
       "name": "healthcheck",
-      "timeout": 300,
+      "timeout": 180,
       "input": {
         "test_mode": true,
         "prompt": "health",
@@ -11,5 +11,10 @@
         "output_format": "wav"
       }
     }
-  ]
+  ],
+  "config": {
+    "env": [
+      {"key": "NOVA_SKIP_MODEL_DOWNLOAD", "value": "1"}
+    ]
+  }
 }
