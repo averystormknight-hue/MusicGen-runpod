@@ -1,12 +1,12 @@
 # MusicGen Serverless (T2M)
 
-RunPod Serverless worker for MusicGen (text-to-music) with optional section-based chunking and crossfades.
+RunPod Serverless worker for MusicGen (text-to-music) with optional section-based chunking and crossfades. Default model: `facebook/musicgen-medium`.
 
 ## Defaults
-- Model: `facebook/musicgen-large`
-- Total length: 90s
+- Model: `facebook/musicgen-medium` (override with `MODEL_NAME` env, e.g., `facebook/musicgen-large`)
+- Total length: 20s (override via `DEFAULT_DURATION_SECONDS`)
 - Structure: `intro|verse|chorus|verse|chorus|outro`
-- Segment length: auto-derived when structure is provided (90s / 6 = ~15s)
+- Segment length: 10s default when structure is provided (override via `DEFAULT_SEGMENT_SECONDS`)
 - Output: WAV
 - top_p: 0.9, top_k: 250, cfg: 3.0, temperature: 1.0
 - Crossfade: 0.5s
@@ -64,5 +64,5 @@ Lyrics are used as conditioning text. This model does **not** guarantee word-acc
 - `DEFAULT_TOP_P` (default: `0.9`)
 
 ## GPU
-- 24GB+ recommended for MusicGen Large
-- Longer durations are split into segments to reduce GPU timeouts
+- Medium runs comfortably on 16–24GB; Large is recommended only with 24GB+.
+- Longer durations are split into segments to reduce GPU timeouts.
