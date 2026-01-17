@@ -12,6 +12,8 @@ import soundfile as sf
 import torch
 from audiocraft.models import MusicGen
 
+print("[MusicGen] handler imported and starting…")
+
 MODEL_NAME = os.getenv("MODEL_NAME", "facebook/musicgen-medium")
 DEFAULT_DURATION_SECONDS = int(os.getenv("DEFAULT_DURATION_SECONDS", "20"))
 DEFAULT_SEGMENT_SECONDS = int(os.getenv("DEFAULT_SEGMENT_SECONDS", "10"))
