@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "healthcheck",
+      "timeout": 300,
+      "input": {
+        "test_mode": true,
+        "prompt": "health",
+        "duration_seconds": 5,
+        "segment_seconds": 5,
+        "output_format": "wav"
+      }
+    }
+  ]
+}
