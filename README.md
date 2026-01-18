@@ -2,7 +2,7 @@
 
 RunPod Serverless worker for MusicGen (text-to-music) with optional section-based chunking and crossfades. Default model: `facebook/musicgen-medium`.
 
-## Defaults
+## Defaults 
 - Model: `facebook/musicgen-medium` (override with `MODEL_NAME` env, e.g., `facebook/musicgen-large`)
 - Total length: 20s (override via `DEFAULT_DURATION_SECONDS`)
 - Structure: `intro|verse|chorus|verse|chorus|outro`
