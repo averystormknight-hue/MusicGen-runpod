@@ -132,6 +132,7 @@ def encode_audio(audio, sample_rate, output_format):
 def handler(job):
     inp = job.get("input", {})
     if inp.get("test_mode") is True:
+        print("[MusicGen] test_mode short-circuit")
         return {"status": "ok"}
 
     prompt = inp.get("prompt", "").strip()
