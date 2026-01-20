@@ -1,25 +1,31 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -e
+
+# Error trap
+trap 'echo "❌ Error on line $LINENO. Command exited with status $?"' ERR
+
+echo "🚀 Starting MusicGen entrypoint script..."
 
 # Check and configure caching directories
 if [ -d /runpod-volume ]; then
-  echo "Using /runpod-volume for caching directories..."
+  echo "✅ Using /runpod-volume for caching directories..."
   mkdir -p /runpod-volume/hf /runpod-volume/torch
   export HF_HOME=/runpod-volume/hf
   export TRANSFORMERS_CACHE=/runpod-volume/hf
   export TORCH_HOME=/runpod-volume/torch
 else
-  echo "Warning: /runpod-volume not found! Using local cache directories..."
-  mkdir -p /app/.cache/huggingface /app/.cache/torch
-  export HF_HOME=/app/.cache/huggingface
-  export TRANSFORMERS_CACHE=/app/.cache/huggingface
-  export TORCH_HOME=/app/.cache/torch
+  echo "⚠️ Warning: /runpod-volume not found! Using local cache directories..."
+  mkdir -p /tmp/hf /tmp/torch
+  export HF_HOME=/tmp/hf
+  export TRANSFORMERS_CACHE=/tmp/hf
+  export TORCH_HOME=/tmp/torch
 fi
 
-echo "Cache directories:"
-echo "HF_HOME=$HF_HOME"
-echo "TRANSFORMERS_CACHE=$TRANSFORMERS_CACHE"
-echo "TORCH_HOME=$TORCH_HOME"
+echo "📂 Cache directories:"
+echo "  HF_HOME=$HF_HOME"
+echo "  TRANSFORMERS_CACHE=$TRANSFORMERS_CACHE"
+echo "  TORCH_HOME=$TORCH_HOME"
 
 # Start the handler
-python3 -u /app/handler.py
+echo "🎤 Starting the handler..."
+exec python3 -u /app/handler.py
