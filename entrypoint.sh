@@ -27,5 +27,13 @@ echo "  TRANSFORMERS_CACHE=$TRANSFORMERS_CACHE"
 echo "  TORCH_HOME=$TORCH_HOME"
 
 # Start the handler
+echo "🐍 Checking Python environment..."
+python3 --version
+python3 -c "import runpod; print('RunPod installed')" || echo "❌ RunPod NOT installed"
+python3 -c "import audiocraft; print('Audiocraft installed')" || echo "❌ Audiocraft NOT installed"
+
 echo "🎤 Starting the handler..."
-exec python3 -u /app/handler.py
+python3 -u /app/handler.py
+HANDLER_EXIT=$?
+echo "❌ Handler exited with code $HANDLER_EXIT"
+exit $HANDLER_EXIT
