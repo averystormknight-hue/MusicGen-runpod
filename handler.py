@@ -43,7 +43,8 @@ def get_model():
     if _MODEL is None:
         print(f"Downloading and loading model '{MODEL_NAME}'...")
         _MODEL = MusicGen.get_pretrained(MODEL_NAME)
-        _MODEL.to(_DEVICE)
+        # MusicGen wrapper handles device placement internally or upon generation
+        # _MODEL.to(_DEVICE) <- This fails because MusicGen isn't an nn.Module
         print("Model loaded successfully!")
     return _MODEL
 
