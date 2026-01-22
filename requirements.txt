@@ -1,4 +1,5 @@
 audiocraft==1.2.0
 runpod
 soundfile
-numpy
+numpy<2.0
+transformers<4.39.0
